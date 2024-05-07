@@ -3,23 +3,33 @@ package com.example;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.*;
+import java.math.RoundingMode;
 
 public class FractalCanvas {
-    private int width, height, maxiterations;
+    private int width, height, maxIterations = 50, scaling = 2;
     private float magnificationFactor, moveX, moveY;
     private PApplet p;
     String lastImageInputHash = "";
     PImage img;
 
-    public FractalCanvas(PApplet p, int width, int height, float magnificationFactor, float moveX, float moveY,
-            int maxiterations) {
+    public FractalCanvas(PApplet p, int width, int height, float magnificationFactor, float moveX, float moveY) {
         this.p = p;
         this.width = width;
         this.height = height;
         this.magnificationFactor = magnificationFactor;
         this.moveX = moveX;
         this.moveY = moveY;
-        this.maxiterations = maxiterations;
+    }
+
+    public void setMaxIterations(int maxIterations) {
+        this.maxIterations = PApplet.max(maxIterations, 1);
+    }
+
+    public void setScaling(int scaling) {
+        this.scaling = PApplet.max(scaling, 1);
     }
 
     public void draw() {
@@ -35,41 +45,48 @@ public class FractalCanvas {
     public void keyPressed(char key) {
         if (key == 'w') {
             moveY += 0.1 / magnificationFactor;
-        } else if (key == 's') {
+        }
+        if (key == 's') {
             moveY -= 0.1 / magnificationFactor;
-        } else if (key == 'a') {
+        }
+        if (key == 'a') {
             moveX += 0.1 / magnificationFactor;
-        } else if (key == 'd') {
+        }
+        if (key == 'd') {
             moveX -= 0.1 / magnificationFactor;
-        } else if (key == 'r') {
+        }
+        if (key == 'r') {
             magnificationFactor *= 2.0;
-        } else if (key == 'f') {
+        }
+        if (key == 'f') {
             magnificationFactor /= 2.0;
         }
     }
 
     private String getInputHash() {
-        return width + " " + height + " " + magnificationFactor + " " + moveX + " " + moveY + " " + maxiterations;
+        return width + " " + height + " " + magnificationFactor + " " + moveX + " " + moveY + " " + maxIterations + " "
+                + scaling;
     }
 
     private PImage mandelbrot() {
-        PImage img = p.createImage(width, height, PConstants.RGB);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                double zx = 0;
+        PImage img = p.createImage(width / scaling, height / scaling, PConstants.RGB);
+        for (int x = 0; x < img.width; x++) {
+            for (int y = 0; y < img.height; y++) {
+                bigDecimal zx = 0;
                 double zy = 0;
-                double cX = (x - width / 2) / (magnificationFactor * width / 4) - moveX;
-                double cY = (y - height / 2) / (magnificationFactor * height / 4) - moveY;
-                int iter = maxiterations;
+                double cX = (x - img.width / 2) / (magnificationFactor * img.width / 4) - moveX;
+                double cY = (y - img.height / 2) / (magnificationFactor * img.height / 4) - moveY;
+                int iter = maxIterations;
                 while (zx * zx + zy * zy < 4 && iter > 0) {
                     double tmp = zx * zx - zy * zy + cX;
                     zy = 2.0f * zx * zy + cY;
                     zx = tmp;
                     iter--;
                 }
-                img.pixels[x + y * width] = p.color(PApplet.map(iter, 0, maxiterations, 0, 255));
+                img.pixels[x + y * img.width] = p.color(PApplet.map(iter, 0, maxIterations, 0, 255));
             }
         }
+        img.resize(width, height);
         return img;
     }
 }
