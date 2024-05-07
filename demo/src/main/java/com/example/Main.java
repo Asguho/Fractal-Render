@@ -42,13 +42,13 @@ public class Main extends processing.core.PApplet {
         PImage img = createImage(width, height, RGB);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                float zx = 0;
-                float zy = 0;
-                float cX = (x - width / 2) / (magnificationFactor * width / 4) - moveX;
-                float cY = (y - height / 2) / (magnificationFactor * height / 4) - moveY;
+                double zx = 0;
+                double zy = 0;
+                double cX = (x - width / 2) / (magnificationFactor * width / 4) - moveX;
+                double cY = (y - height / 2) / (magnificationFactor * height / 4) - moveY;
                 int iter = maxiterations;
                 while (zx * zx + zy * zy < 4 && iter > 0) {
-                    float tmp = zx * zx - zy * zy + cX;
+                    double tmp = zx * zx - zy * zy + cX;
                     zy = 2.0f * zx * zy + cY;
                     zx = tmp;
                     iter--;
