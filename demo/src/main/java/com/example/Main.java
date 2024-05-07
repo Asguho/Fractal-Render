@@ -4,7 +4,7 @@ import processing.core.*;
 
 public class Main extends processing.core.PApplet {
     int maxiterations = 100;
-    float magnificationFactor = 400;
+    float magnificationFactor = 1;
     float moveX = 0;
     float moveY = 0;
 
@@ -44,8 +44,8 @@ public class Main extends processing.core.PApplet {
             for (int y = 0; y < height; y++) {
                 float zx = 0;
                 float zy = 0;
-                float cX = (x - width / 2) / magnificationFactor - moveX;
-                float cY = (y - height / 2) / magnificationFactor - moveY;
+                float cX = (x - width / 2) / (magnificationFactor * width / 4) - moveX;
+                float cY = (y - height / 2) / (magnificationFactor * height / 4) - moveY;
                 int iter = maxiterations;
                 while (zx * zx + zy * zy < 4 && iter > 0) {
                     float tmp = zx * zx - zy * zy + cX;
@@ -61,17 +61,17 @@ public class Main extends processing.core.PApplet {
 
     public void keyPressed() {
         if (key == 'w') {
-            moveY += 0.1;
+            moveY += 0.1 / magnificationFactor;
         } else if (key == 's') {
-            moveY -= 0.1;
+            moveY -= 0.1 / magnificationFactor;
         } else if (key == 'a') {
-            moveX += 0.1;
+            moveX += 0.1 / magnificationFactor;
         } else if (key == 'd') {
-            moveX -= 0.1;
+            moveX -= 0.1 / magnificationFactor;
         } else if (key == 'r') {
-            magnificationFactor += 25;
+            magnificationFactor *= 2.0;
         } else if (key == 'f') {
-            magnificationFactor -= 25;
+            magnificationFactor /= 2.0;
         }
     }
 
