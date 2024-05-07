@@ -3,10 +3,6 @@ package com.example;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.*;
-import java.math.RoundingMode;
 
 public class FractalCanvas {
     private int width, height, maxIterations = 50, scaling = 2;
@@ -72,7 +68,7 @@ public class FractalCanvas {
         PImage img = p.createImage(width / scaling, height / scaling, PConstants.RGB);
         for (int x = 0; x < img.width; x++) {
             for (int y = 0; y < img.height; y++) {
-                bigDecimal zx = 0;
+                double zx = 0;
                 double zy = 0;
                 double cX = (x - img.width / 2) / (magnificationFactor * img.width / 4) - moveX;
                 double cY = (y - img.height / 2) / (magnificationFactor * img.height / 4) - moveY;
