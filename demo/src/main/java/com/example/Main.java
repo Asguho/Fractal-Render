@@ -8,6 +8,9 @@ public class Main extends processing.core.PApplet {
     float moveX = 0;
     float moveY = 0;
 
+    String lastImageInputs = "";
+    PImage img;
+
     public static void main(String[] args) {
         PApplet.main("com.example.Main", args);
     }
@@ -22,13 +25,21 @@ public class Main extends processing.core.PApplet {
 
     public void draw() {
         clear();
-        mandelbrot();
+        lastImageInputs = width + " " + height + " " + magnificationFactor + " " + moveX + " " + moveY + " "
+                + maxiterations;
+        if (lastImageInputs != width + " " + height + " " + magnificationFactor + " " + moveX + " " + moveY + " "
+                + maxiterations) {
+            img = mandelbrot(width, height, magnificationFactor, moveX, moveY, maxiterations);
+        }
+        image(img, 0, 0);
 
+        fill(0);
         text("FPS: " + frameRate, 10, 10);
     }
 
-    // calculate a mandelbrot fractal
-    public void mandelbrot() {
+    public PImage mandelbrot(int width, int height, float magnificationFactor, float moveX, float moveY,
+            int maxiterations) {
+        PImage img = createImage(width, height, RGB);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 float zx = 0;
@@ -42,10 +53,10 @@ public class Main extends processing.core.PApplet {
                     zx = tmp;
                     iter--;
                 }
-                stroke(iter);
-                point(x, y);
+                img.pixels[x + y * width] = color(map(iter, 0, maxiterations, 0, 255));
             }
         }
+        return img;
     }
 
     public void keyPressed() {
