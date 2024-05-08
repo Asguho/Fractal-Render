@@ -5,7 +5,7 @@ import processing.core.PApplet;
 public class Main extends processing.core.PApplet {
     FractalCanvas fractalCanvas = new FractalCanvas(this, 800, 800, 1.0f, 0.0f, 0.0f);
     IntInputField maxIterationsInputField = new IntInputField(this, "Max Iterations", 10, 60, "100", true);
-    IntInputField scalingInputField = new IntInputField(this, "Scaling", 10, 90, "1", true);
+    IntInputField resolutionFactorInputField = new IntInputField(this, "resolutionFactor", 10, 90, "1", true);
 
     public static void main(String[] args) {
         PApplet.main("com.example.Main", args);
@@ -25,10 +25,10 @@ public class Main extends processing.core.PApplet {
         fill(0);
         text("FPS: " + frameRate, 10, 20);
         maxIterationsInputField.draw();
-        scalingInputField.draw();
+        resolutionFactorInputField.draw();
 
         fractalCanvas.setMaxIterations(maxIterationsInputField.getValue());
-        fractalCanvas.setScaling(scalingInputField.getValue());
+        fractalCanvas.setResolutionFactor(resolutionFactorInputField.getValue());
     }
 
     public void keyPressed() {

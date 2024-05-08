@@ -5,7 +5,7 @@ import processing.core.PConstants;
 import processing.core.PImage;
 
 public class FractalCanvas {
-    private int width, height, maxIterations = 50, scaling = 2;
+    private int width, height, maxIterations = 50, resolutionFactor = 2;
     private float magnificationFactor, moveX, moveY;
     private PApplet p;
     String lastImageInputHash = "";
@@ -24,8 +24,8 @@ public class FractalCanvas {
         this.maxIterations = PApplet.max(maxIterations, 1);
     }
 
-    public void setScaling(int scaling) {
-        this.scaling = PApplet.max(scaling, 1);
+    public void setResolutionFactor(int resolutionFactor) {
+        this.resolutionFactor = PApplet.max(resolutionFactor, 1);
     }
 
     public void draw() {
@@ -61,17 +61,21 @@ public class FractalCanvas {
 
     private String getInputHash() {
         return width + " " + height + " " + magnificationFactor + " " + moveX + " " + moveY + " " + maxIterations + " "
-                + scaling;
+                + resolutionFactor;
     }
 
     private PImage mandelbrot() {
-        PImage img = p.createImage(width / scaling, height / scaling, PConstants.RGB);
+        PImage img = p.createImage(width / resolutionFactor, height / resolutionFactor, PConstants.RGB);
         for (int x = 0; x < img.width; x++) {
             for (int y = 0; y < img.height; y++) {
                 double zx = 0;
                 double zy = 0;
                 double cX = (x - img.width / 2) / (magnificationFactor * img.width / 4) - moveX;
                 double cY = (y - img.height / 2) / (magnificationFactor * img.height / 4) - moveY;
+                if (x == 10) {
+                    // p.printLn(cX + " " + cY + " " + magnificationFactor);
+                    System.err.println(cX + " " + cY + " " + magnificationFactor);
+                }
                 int iter = maxIterations;
                 while (zx * zx + zy * zy < 4 && iter > 0) {
                     double tmp = zx * zx - zy * zy + cX;
