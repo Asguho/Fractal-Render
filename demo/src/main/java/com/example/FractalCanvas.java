@@ -31,8 +31,8 @@ public class FractalCanvas {
     public void draw() {
         if (!lastImageInputHash.equals(getInputHash())) {
             // && (p.frameRate > 30)
-            System.err.println();
-            img = mandelbrot();
+            // img = mandelbrot();
+            img = getChunksWithEdge(sobelEdgeDetection(blur(mandelbrot())), 5);
             lastImageInputHash = getInputHash();
         }
         p.image(img, 400, 0);
@@ -72,10 +72,6 @@ public class FractalCanvas {
                 double zy = 0;
                 double cX = (x - img.width / 2) / (magnificationFactor * img.width / 4) - moveX;
                 double cY = (y - img.height / 2) / (magnificationFactor * img.height / 4) - moveY;
-                if (x == 10) {
-                    // p.printLn(cX + " " + cY + " " + magnificationFactor);
-                    System.err.println(cX + " " + cY + " " + magnificationFactor);
-                }
                 int iter = maxIterations;
                 while (zx * zx + zy * zy < 4 && iter > 0) {
                     double tmp = zx * zx - zy * zy + cX;
@@ -88,5 +84,84 @@ public class FractalCanvas {
         }
         img.resize(width, height);
         return img;
+    }
+
+    private PImage sobelEdgeDetection(PImage inputImage) {
+        PImage outputImage = p.createImage(inputImage.width, inputImage.height, PConstants.RGB);
+        int[][] Gx = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+        int[][] Gy = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
+        for (int x = 0; x < inputImage.width; x++) {
+            for (int y = 0; y < inputImage.height; y++) {
+                float sumX = 0;
+                float sumY = 0;
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        int loc = (x + i - 1) + (y + j - 1) * inputImage.width;
+                        if (loc >= 0 && loc < inputImage.pixels.length) {
+                            sumX += p.red(inputImage.pixels[loc]) * Gx[i][j];
+                            sumY += p.red(inputImage.pixels[loc]) * Gy[i][j];
+                        }
+                    }
+                }
+                float sum = PApplet.sqrt(sumX * sumX + sumY * sumY);
+                outputImage.pixels[x + y * inputImage.width] = p.color(sum);
+            }
+        }
+        return outputImage;
+    }
+
+    private PImage blur(PImage inputImage) {
+        PImage outputImage = p.createImage(inputImage.width, inputImage.height, PConstants.RGB);
+        int[][] blurMatrix = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
+        for (int x = 0; x < inputImage.width; x++) {
+            for (int y = 0; y < inputImage.height; y++) {
+                float sum = 0;
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        int loc = (x + i - 1) + (y + j - 1) * inputImage.width;
+                        if (loc >= 0 && loc < inputImage.pixels.length) {
+                            sum += p.red(inputImage.pixels[loc]) * blurMatrix[i][j];
+                        }
+                    }
+                }
+                outputImage.pixels[x + y * inputImage.width] = p.color(sum);
+            }
+        }
+        return outputImage;
+    }
+
+    private PImage getChunksWithEdge(PImage inputImage, int chunkSize) {
+        PImage outputImage = p.createImage(inputImage.width, inputImage.height, PConstants.RGB);
+        int numberOfChunks = 0;
+        for (int x = 0; x < inputImage.width; x += chunkSize) {
+            for (int y = 0; y < inputImage.height; y += chunkSize) {
+                int sum = 0;
+                for (int i = 0; i < chunkSize; i++) {
+                    for (int j = 0; j < chunkSize; j++) {
+                        int loc = (x + i) + (y + j) * inputImage.width;
+                        if (loc >= 0 && loc < inputImage.pixels.length) {
+                            sum += p.red(inputImage.pixels[loc]);
+                        }
+                    }
+                }
+                int avg = sum / (chunkSize * chunkSize);
+
+                if (avg > 0) {
+                    // System.err.println("avg > 0: " + avg);
+                    numberOfChunks++;
+
+                    for (int i = 0; i < chunkSize; i++) {
+                        for (int j = 0; j < chunkSize; j++) {
+                            int loc = (x + i) + (y + j) * inputImage.width;
+                            if (loc >= 0 && loc < inputImage.pixels.length) {
+                                outputImage.pixels[loc] = p.color(255);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.err.println("numberOfChunks: " + numberOfChunks + ", chunksize: " + chunkSize);
+        return outputImage;
     }
 }
