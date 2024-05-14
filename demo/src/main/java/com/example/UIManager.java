@@ -45,7 +45,7 @@ public class UIManager {
     }
 
     private void updateUIValues() {
-        p.text("MagnificationFactor: " + (int) fractalCanvas.getMagnificationFactor(), 10, 50);
+        p.text("MagnificationFactor: " + (int) fractalCanvas.getMagnificationFactor() + "x", 10, 50);
         fractalCanvas.setMaxIterations(maxIterationsInputField.getValue());
         fractalCanvas.setResolutionFactor(resolutionFactorInputField.getValue());
     }
