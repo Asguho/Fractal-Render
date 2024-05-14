@@ -5,18 +5,22 @@ import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
 
-public class FractalCanvas {
-    private int width, height, maxIterations = 50, resolutionFactor = 2;
+public class FractalCanvas extends UIElement {
+    private int maxIterations = 50, resolutionFactor = 2;
     private float magnificationFactor, moveX, moveY;
     private PApplet p;
     String lastImageInputHash = "";
     PImage img;
     int chunkSize = 5;
+    float fractalDimension = 0;
 
-    public FractalCanvas(PApplet p, int width, int height, float magnificationFactor, float moveX, float moveY) {
+    public FractalCanvas(PApplet p, int x, int y, int width, int height, float magnificationFactor, float moveX,
+            float moveY) {
         this.p = p;
-        this.width = width;
-        this.height = height;
+        this.position.x = x;
+        this.position.y = y;
+        this.size.x = width;
+        this.size.y = height;
         this.magnificationFactor = magnificationFactor;
         this.moveX = moveX;
         this.moveY = moveY;
@@ -36,10 +40,9 @@ public class FractalCanvas {
 
     public void draw() {
         if (!lastImageInputHash.equals(getInputHash())) {
-            float dim = calcFrataIDimension();
-            System.err.println("dim: " + dim);
+            // System.err.println("dim: " + dim);
             // && (p.frameRate > 30)
-            // img = mandelbrot();
+            img = mandelbrot(resolutionFactor);
             // img = getChunksWithEdge(sobelEdgeDetection(blur(mandelbrot())), 5);
             // img = mandelbrot();
             // loop though chunks with edge
@@ -55,7 +58,10 @@ public class FractalCanvas {
             // System.err.println("result: " + result[0] + ", " + result[1]);
 
         }
-        // p.image(img, 400, 0);
+        p.image(img, position.x, position.y);
+        if (fractalDimension != 0) {
+            p.text("Fractal Dimension: " + fractalDimension, 10, 260);
+        }
         // drawChunks(img);
 
     }
@@ -71,7 +77,11 @@ public class FractalCanvas {
 
     }
 
-    private float[] calculateFractalDimension(PImage inputImage) {
+    public void renderCalculateFractalDimension() {
+        fractalDimension = calculateFractalDimension();
+    }
+
+    private float[] calculateFractalDimensionOLD(PImage inputImage) {
         float[] chunks = new float[10];
         float[] chunksSize = new float[10];
         for (int i = 1; i < 10; i++) {
@@ -91,44 +101,7 @@ public class FractalCanvas {
         return linearRegression(x, y);
     }
 
-    // public float calcFrataIDimension()
-    // "Fratat": Unknown word.
-    // long[] totatPixets
-    // = new tong [18];
-    // for (int scalingFactor = 18; scalingFactor 1; scalingFactor—) {
-    // // 1600, 1000, scalingFactor, 100, 1.4, -1.2d, O.Od, 9d, Od
-    // FractalParams params = new z:1.4d, -1.2d, oy:O.Od,
-    // w:40G9,
-    // h :4000,
-    // scatingFactor) ;
-    // Plmage img = drawmandetbrot(params) ;
-    // img = twoToneFiIter (img) ;
-    // Img = sobeIEdgeDetection (img) ;
-    // + scalingFactor +
-    // tong whitePixets = O
-    // img. toadPixeIs ( ) ;
-    // for (int x = O; x <
-    // img.width; x++) {
-    // png") ;
-    // for (int y = 8; y < img.height; Y++) {
-    // int c = img.pixets[x + y * img.width] ;
-    // = 255 p.blue(c) = 255) {
-    // if (p. red(c)
-    // = 255 && p. green(c)
-    // whitePixe1s ;
-    // totatPixets [ scalingFactor
-    // pixels:
-    // float[] x = new
-    // float[] y = new float[10];
-    // for (int i = O; i < 18; i++) {
-    // whitePixets ;
-    // + whitePixets) ;
-    // x[i] = PApptet.tog(1.Of / (float) (i + 1));
-    // = totatPixets[i]);
-    // float[] regression = linearRegression(x, y) ;
-    // return regression [1];
-
-    private float calcFrataIDimension() {
+    public float calculateFractalDimension() {
         long[] totalPixels = new long[10];
         for (int scalingFactor = 10; scalingFactor >= 1; scalingFactor--) {
             PImage img;
@@ -154,7 +127,7 @@ public class FractalCanvas {
             System.err.println("x: " + x[i] + ", y: " + y[i] + ", totalPixels: " + totalPixels[i]);
         }
         float[] regression = linearRegression(x, y);
-        return regression[0];
+        return regression[1];
     }
 
     private float[] reverseFloatArray(float[] array) {
@@ -192,12 +165,12 @@ public class FractalCanvas {
     }
 
     private String getInputHash() {
-        return width + " " + height + " " + magnificationFactor + " " + moveX + " " + moveY + " " + maxIterations + " "
+        return size.x + " " + size.y + " " + magnificationFactor + " " + moveX + " " + moveY + " " + maxIterations + " "
                 + resolutionFactor + " " + chunkSize;
     }
 
     private PImage mandelbrot(int resolutionFactor) {
-        PImage img = p.createImage(width / resolutionFactor, height / resolutionFactor, PConstants.RGB);
+        PImage img = p.createImage((int) size.x / resolutionFactor, (int) size.y / resolutionFactor, PConstants.RGB);
         for (int x = 0; x < img.width; x++) {
             for (int y = 0; y < img.height; y++) {
                 double zR = 0;
@@ -214,12 +187,12 @@ public class FractalCanvas {
                 img.pixels[x + y * img.width] = p.color(PApplet.map(iter, 0, maxIterations, 0, 255));
             }
         }
-        img.resize(width, height);
+        img.resize((int) size.x, (int) size.y);
         return img;
     }
 
     private PImage julia() {
-        PImage img = p.createImage(width / resolutionFactor, height / resolutionFactor, PConstants.RGB);
+        PImage img = p.createImage((int) size.x / resolutionFactor, (int) size.y / resolutionFactor, PConstants.RGB);
         double cX = -0.7;
         double cY = 0.27015;
         for (int x = 0; x < img.width; x++) {
@@ -236,7 +209,7 @@ public class FractalCanvas {
                 img.pixels[x + y * img.width] = p.color(PApplet.map(iter, 0, maxIterations, 0, 255));
             }
         }
-        img.resize(width, height);
+        img.resize((int) size.x, (int) size.y);
         return img;
     }
 
@@ -327,9 +300,9 @@ public class FractalCanvas {
             sumXY += x[i] * y[i];
             sumX2 += x[i] * x[i];
         }
-        float m = (x.length * sumXY - sumX * sumY) / (x.length * sumX2 - sumX * sumX);
-        float b = (sumY - m * sumX) / x.length;
-        return new float[] { m, b };
+        float a = (sumY * sumX2 - sumX * sumXY) / (x.length * sumX2 - sumX * sumX);
+        float b = (x.length * sumXY - sumX * sumY) / (x.length * sumX2 - sumX * sumX);
+        return new float[] { a, b };
     }
 
 }

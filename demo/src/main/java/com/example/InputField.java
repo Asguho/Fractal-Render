@@ -2,10 +2,8 @@ package com.example;
 
 import processing.core.*;
 
-class InputField {
+class InputField extends UIElement {
     String label;
-    int x;
-    int y;
     boolean pressed = false;
     boolean mousePressedLastFrame = false;
     boolean keyPressedLastFrame = false;
@@ -16,8 +14,8 @@ class InputField {
     InputField(PApplet p, String label, int x, int y, boolean showValue) {
         this.p = p;
         this.label = label;
-        this.x = x;
-        this.y = y;
+        this.position.x = x;
+        this.position.y = y;
         this.showValue = showValue;
     }
 
@@ -29,7 +27,8 @@ class InputField {
         p.textSize(20);
         p.noStroke();
         p.fill(0);
-        p.text(label + ": " + (showValue ? value : "") + ((pressed && p.frameCount / 20 % 2 == 0) ? "_" : ""), x, y);
+        p.text(label + ": " + (showValue ? value : "") + ((pressed && p.frameCount / 20 % 2 == 0) ? "_" : ""),
+                position.x, position.y);
     }
 
     int getWidth(String value) {
@@ -37,11 +36,13 @@ class InputField {
     }
 
     void checkPressed(String value) {
-        if (isHovering(x - margin, y - margin, x + getWidth(value) + margin, y + margin / 2)) {
+        if (isHovering((int) position.x - margin, (int) position.y - margin,
+                (int) (position.x + getWidth(value) + margin),
+                (int) position.y + margin / 2)) {
             p.stroke(255);
             p.strokeWeight(5);
             p.noFill();
-            p.rect(x - margin, y - margin, getWidth(value) + margin * 2, (float) (margin * 1.5));
+            p.rect(position.x - margin, position.y - margin, getWidth(value) + margin * 2, (float) (margin * 1.5));
             if (p.mousePressed && (mousePressedLastFrame != p.mousePressed)) {
                 pressed = !pressed;
             }

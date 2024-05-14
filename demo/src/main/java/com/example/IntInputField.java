@@ -19,6 +19,8 @@ class IntInputField extends InputField {
     }
 
     void draw() {
+        System.out.println("IntInputField draw: " + label);
+        // p.fill(0);
         drawLabelAndValue(value);
         checkPressed(value);
         checkInput();
