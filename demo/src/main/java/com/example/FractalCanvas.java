@@ -6,21 +6,14 @@ import processing.core.PImage;
 import processing.core.PVector;
 
 public class FractalCanvas extends UIElement {
-    private int maxIterations = 50, resolutionFactor = 2;
-    private float magnificationFactor, moveX, moveY;
-    private PApplet p;
-    String lastImageInputHash = "";
-    PImage img;
-    int chunkSize = 5;
-    float fractalDimension = 0;
+    private int maxIterations, resolutionFactor, chunkSize;
+    private float magnificationFactor, moveX, moveY, fractalDimension = 0;
+    private String lastImageInputHash = "";
+    private PImage img;
 
     public FractalCanvas(PApplet p, int x, int y, int width, int height, float magnificationFactor, float moveX,
             float moveY) {
-        this.p = p;
-        this.position.x = x;
-        this.position.y = y;
-        this.size.x = width;
-        this.size.y = height;
+        super(p, x, y, width, height);
         this.magnificationFactor = magnificationFactor;
         this.moveX = moveX;
         this.moveY = moveY;
@@ -34,8 +27,8 @@ public class FractalCanvas extends UIElement {
         this.resolutionFactor = PApplet.max(resolutionFactor, 1);
     }
 
-    public void setChunkSize(int chunkSize) {
-        this.chunkSize = PApplet.max(chunkSize, 1);
+    public float getMagnificationFactor() {
+        return magnificationFactor;
     }
 
     public void draw() {

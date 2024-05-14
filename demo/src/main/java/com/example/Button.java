@@ -2,24 +2,19 @@ package com.example;
 
 import processing.core.*;
 
-public class Button {
-    private PApplet p;
-    private int x, y, width, height;
+public class Button extends UIElement {
     private ClickListener listener;
     private String label;
 
     Button(PApplet p, String label, int x, int y, int width, int height, ClickListener listener) {
-        this.p = p;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        super(p, x, y, width, height);
         this.listener = listener;
         this.label = label;
     }
 
     private boolean isHovering() {
-        if (p.mouseX > x && p.mouseX < x + width && p.mouseY > y && p.mouseY < y + height) {
+        if (p.mouseX > position.x && p.mouseX < position.x + size.x && p.mouseY > position.y
+                && p.mouseY < position.y + size.y) {
             return true;
         } else {
             return false;
@@ -40,8 +35,8 @@ public class Button {
         p.noFill();
         p.stroke(255);
         p.strokeWeight(5);
-        p.rect(x, y, width, height);
-        p.text(label, x + 5, y + height - 5);
+        p.rect(position.x, position.y, size.x, size.y);
+        p.text(label, position.x + 5, position.y + size.y - 5);
         onClick();
     }
 }

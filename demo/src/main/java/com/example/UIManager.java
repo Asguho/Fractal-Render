@@ -13,8 +13,8 @@ public class UIManager {
     UIManager(PApplet p) {
         this.p = p;
         fractalCanvas = new FractalCanvas(p, 400, 0, 800, 800, 1.0f, 0.0f, 0.0f);
-        maxIterationsInputField = new IntInputField(p, "Max Iterations", 10, 60, "100", true);
-        resolutionFactorInputField = new IntInputField(p, "resolutionFactor", 10, 90, "1", true);
+        maxIterationsInputField = new IntInputField(p, "Max Iterations", 10, 100, "100", true);
+        resolutionFactorInputField = new IntInputField(p, "resolutionFactor", 10, 130, "1", true);
         calculateFractalDimensionButton = new Button(p, "CalculateFractalDimension", 10, 210, 230, 30,
                 new ClickListener() {
                     @Override
@@ -30,11 +30,12 @@ public class UIManager {
         p.background(200);
         drawFPS();
 
+        updateUIValues();
+
         fractalCanvas.draw();
         maxIterationsInputField.draw();
         resolutionFactorInputField.draw();
         calculateFractalDimensionButton.draw();
-        updateUIValues();
 
     }
 
@@ -44,6 +45,7 @@ public class UIManager {
     }
 
     private void updateUIValues() {
+        p.text("MagnificationFactor: " + (int) fractalCanvas.getMagnificationFactor(), 10, 50);
         fractalCanvas.setMaxIterations(maxIterationsInputField.getValue());
         fractalCanvas.setResolutionFactor(resolutionFactorInputField.getValue());
     }

@@ -9,13 +9,10 @@ class InputField extends UIElement {
     boolean keyPressedLastFrame = false;
     boolean showValue = true;
     int margin = 20;
-    PApplet p;
 
     InputField(PApplet p, String label, int x, int y, boolean showValue) {
-        this.p = p;
+        super(p, x, y, 0, 0);
         this.label = label;
-        this.position.x = x;
-        this.position.y = y;
         this.showValue = showValue;
     }
 
