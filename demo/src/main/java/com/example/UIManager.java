@@ -9,6 +9,7 @@ public class UIManager {
     private IntInputField maxIterationsInputField;
     private IntInputField resolutionFactorInputField;
     private Button calculateFractalDimensionButton;
+    private Button drawChunksButton;
     private FloatInputField startingXInputField;
     private FloatInputField startingYInputField;
 
@@ -27,6 +28,12 @@ public class UIManager {
                     }
                 });
         ;
+        drawChunksButton = new Button(p, "DrawChunks", 10, 300, 230, 30, new ClickListener() {
+            @Override
+            public void onClick() {
+                fractalCanvas.enableDrawChunks();
+            }
+        });
     }
 
     public void draw() {
@@ -40,6 +47,7 @@ public class UIManager {
         maxIterationsInputField.draw();
         resolutionFactorInputField.draw();
         calculateFractalDimensionButton.draw();
+        drawChunksButton.draw();
         startingXInputField.draw();
         startingYInputField.draw();
 

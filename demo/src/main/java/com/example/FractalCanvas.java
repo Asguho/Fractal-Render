@@ -6,13 +6,14 @@ import processing.core.PImage;
 import processing.core.PVector;
 
 public class FractalCanvas extends UIElement {
-    private int maxIterations, resolutionFactor, chunkSize;
+    private int maxIterations, resolutionFactor;
     double startingX = 0, startingY = 0;
     private long magnificationFactor;
     private float fractalDimension = 0;
     double moveX, moveY;
     private String lastImageInputHash = "";
     private PImage img;
+    private boolean shouldDrawChunks = false;
 
     public FractalCanvas(PApplet p, int x, int y, int width, int height, long magnificationFactor, float moveX,
             float moveY) {
@@ -44,35 +45,27 @@ public class FractalCanvas extends UIElement {
 
     public void draw() {
         if (!lastImageInputHash.equals(getInputHash())) {
-            PApplet.println("redraw");
-            // do calculation
-            // System.err.println("dim: " + dim);
-            // && (p.frameRate > 30)
-            img = mandelbrot(resolutionFactor);
-            // img = getChunksWithEdge(sobelEdgeDetection(blur(mandelbrot())), 5);
-            // img = mandelbrot();
-            // loop though chunks with edge
-
-            // img = julia();
+            img = sobelEdgeDetection(mandelbrot(resolutionFactor));
             lastImageInputHash = getInputHash();
-            // // test linear regression
-            // float[] x = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f };
-            // float[] y = { 2.0f, 4.0f, 6.0f, 8.0f, 10.0f };
-            // float[] result1 = linearRegression(x, y);
-            // float[] result = calculateFractalDimension(img);
-            // System.err.println("result1: " + result1[0] + ", " + result1[1]);
-            // System.err.println("result: " + result[0] + ", " + result[1]);
+        }
+        System.err.println(shouldDrawChunks);
 
-        }
         p.image(img, position.x, position.y);
-        if (fractalDimension != 0) {
+
+        if (fractalDimension != 0)
             p.text("Fractal Dimension: " + fractalDimension, 10, 260);
-        }
-        // drawChunks(img);
+
+        if (shouldDrawChunks)
+            drawChunks(img);
 
     }
 
+    public void enableDrawChunks() {
+        shouldDrawChunks = !shouldDrawChunks;
+    }
+
     private void drawChunks(PImage inputImage) {
+        int chunkSize = 10;
         PVector[] chunks = getChunksWithEdge(sobelEdgeDetection(img), chunkSize);
         p.noFill();
         p.strokeWeight(1);
@@ -92,7 +85,7 @@ public class FractalCanvas extends UIElement {
         float[] chunksSize = new float[10];
         for (int i = 0; i < 10; i++) {
             chunksSize[i] = (i + 1);
-            chunks[i] = getAmountOfChunksWithEdge(sobelEdgeDetection(img), (i + 1));
+            chunks[i] = getAmountOfChunksWithEdge(sobelEdgeDetection(inputImage), (i + 1));
         }
         float[] x = new float[10];
         float[] y = new float[10];
@@ -104,7 +97,7 @@ public class FractalCanvas extends UIElement {
     }
 
     private int getAmountOfChunksWithEdge(PImage inputImage, int chunkSize) {
-        PVector[] chunks = getChunksWithEdge(sobelEdgeDetection(img), chunkSize);
+        PVector[] chunks = getChunksWithEdge(sobelEdgeDetection(inputImage), chunkSize);
         return chunks.length;
     }
 
@@ -161,29 +154,31 @@ public class FractalCanvas extends UIElement {
         return img;
     }
 
-    private PImage julia() {
-        PImage img = p.createImage((int) size.x / resolutionFactor, (int) size.y / resolutionFactor, PConstants.RGB);
-        double cX = -0.7;
-        double cY = 0.27015;
-        for (int x = 0; x < img.width; x++) {
-            for (int y = 0; y < img.height; y++) {
-                double zR = (double) ((double) x - (double) img.width / 2)
-                        / (double) ((double) magnificationFactor * (double) img.width / 4) - moveX;
-                double zI = (double) ((double) y - (double) img.height / 2)
-                        / (double) ((double) magnificationFactor * (double) img.height / 4) - moveY;
-                int iter = maxIterations;
-                while (zR * zR + zI * zI < 4 && iter > 0) {
-                    double tmp = zR * zR - zI * zI + cX;
-                    zI = 2.0f * zR * zI + cY;
-                    zR = tmp;
-                    iter--;
-                }
-                img.pixels[x + y * img.width] = p.color(PApplet.map(iter, 0, maxIterations, 0, 255));
-            }
-        }
-        img.resize((int) size.x, (int) size.y);
-        return img;
-    }
+    // private PImage julia() {
+    // PImage img = p.createImage((int) size.x / resolutionFactor, (int) size.y /
+    // resolutionFactor, PConstants.RGB);
+    // double cX = -0.7;
+    // double cY = 0.27015;
+    // for (int x = 0; x < img.width; x++) {
+    // for (int y = 0; y < img.height; y++) {
+    // double zR = (double) ((double) x - (double) img.width / 2)
+    // / (double) ((double) magnificationFactor * (double) img.width / 4) - moveX;
+    // double zI = (double) ((double) y - (double) img.height / 2)
+    // / (double) ((double) magnificationFactor * (double) img.height / 4) - moveY;
+    // int iter = maxIterations;
+    // while (zR * zR + zI * zI < 4 && iter > 0) {
+    // double tmp = zR * zR - zI * zI + cX;
+    // zI = 2.0f * zR * zI + cY;
+    // zR = tmp;
+    // iter--;
+    // }
+    // img.pixels[x + y * img.width] = p.color(PApplet.map(iter, 0, maxIterations,
+    // 0, 255));
+    // }
+    // }
+    // img.resize((int) size.x, (int) size.y);
+    // return img;
+    // }
 
     private PImage sobelEdgeDetection(PImage inputImage) {
         PImage outputImage = p.createImage(inputImage.width, inputImage.height, PConstants.RGB);
@@ -203,26 +198,6 @@ public class FractalCanvas extends UIElement {
                     }
                 }
                 float sum = PApplet.sqrt(sumX * sumX + sumY * sumY);
-                outputImage.pixels[x + y * inputImage.width] = p.color(sum);
-            }
-        }
-        return outputImage;
-    }
-
-    private PImage blur(PImage inputImage) {
-        PImage outputImage = p.createImage(inputImage.width, inputImage.height, PConstants.RGB);
-        int[][] blurMatrix = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
-        for (int x = 0; x < inputImage.width; x++) {
-            for (int y = 0; y < inputImage.height; y++) {
-                float sum = 0;
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        int loc = (x + i - 1) + (y + j - 1) * inputImage.width;
-                        if (loc >= 0 && loc < inputImage.pixels.length) {
-                            sum += p.red(inputImage.pixels[loc]) * blurMatrix[i][j];
-                        }
-                    }
-                }
                 outputImage.pixels[x + y * inputImage.width] = p.color(sum);
             }
         }

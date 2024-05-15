@@ -4,6 +4,7 @@ import processing.core.*;
 
 public class Button extends UIElement {
     private ClickListener listener;
+    private boolean keyPressedLastFrame = false;
     private String label;
 
     Button(PApplet p, String label, int x, int y, int width, int height, ClickListener listener) {
@@ -22,8 +23,11 @@ public class Button extends UIElement {
     }
 
     private void onClick() {
-        if (p.mousePressed && isHovering()) {
+        if (p.mousePressed && isHovering() && !keyPressedLastFrame) {
+            keyPressedLastFrame = true;
             listener.onClick();
+        } else if (!p.mousePressed) {
+            keyPressedLastFrame = false;
         }
     }
 
@@ -33,7 +37,7 @@ public class Button extends UIElement {
 
     public void draw() {
         p.noFill();
-        p.stroke(255);
+        p.stroke(50);
         p.strokeWeight(5);
         p.rect(position.x, position.y, size.x, size.y);
         p.text(label, position.x + 5, position.y + size.y - 5);
