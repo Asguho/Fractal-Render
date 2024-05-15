@@ -7,6 +7,7 @@ import processing.core.PVector;
 
 public class FractalCanvas extends UIElement {
     private int maxIterations, resolutionFactor, chunkSize;
+    double startingX = 0, startingY = 0;
     private long magnificationFactor;
     private float fractalDimension = 0;
     double moveX, moveY;
@@ -27,6 +28,14 @@ public class FractalCanvas extends UIElement {
 
     public void setResolutionFactor(int resolutionFactor) {
         this.resolutionFactor = PApplet.max(resolutionFactor, 1);
+    }
+
+    public void setStartingX(double startingX) {
+        this.startingX = startingX;
+    }
+
+    public void setStartingY(double startingY) {
+        this.startingY = startingY;
     }
 
     public long getMagnificationFactor() {
@@ -165,7 +174,7 @@ public class FractalCanvas extends UIElement {
 
     private String getInputHash() {
         return size.x + " " + size.y + " " + magnificationFactor + " " + moveX + " " + moveY + " " + maxIterations + " "
-                + resolutionFactor;
+                + resolutionFactor + " " + startingX + " " + startingY;
     }
 
     private PImage mandelbrot(int resolutionFactor) {
@@ -173,8 +182,8 @@ public class FractalCanvas extends UIElement {
                 PConstants.RGB);
         for (int x = 0; x < img.width; x++) {
             for (int y = 0; y < img.height; y++) {
-                double zR = 0;
-                double zI = 0;
+                double zR = startingX;
+                double zI = startingY;
                 double cR = (double) ((double) x - (double) img.width / 2.0)
                         / (double) ((double) magnificationFactor * (double) img.width / 4.0) - moveX;
                 double cI = (double) ((double) y - (double) img.height / 2.0)
