@@ -45,7 +45,7 @@ public class FractalCanvas extends UIElement {
 
     public void draw() {
         if (!lastImageInputHash.equals(getInputHash())) {
-            img = sobelEdgeDetection(mandelbrot(resolutionFactor));
+            img = mandelbrot(resolutionFactor);
             lastImageInputHash = getInputHash();
         }
         System.err.println(shouldDrawChunks);
