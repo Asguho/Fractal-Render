@@ -84,64 +84,23 @@ public class FractalCanvas extends UIElement {
     }
 
     public void renderCalculateFractalDimension() {
-        fractalDimension = calculateFractalDimension();
+        fractalDimension = calculateFractalDimension(mandelbrot(1));
     }
 
-    private float[] calculateFractalDimensionOLD(PImage inputImage) {
+    private float calculateFractalDimension(PImage inputImage) {
         float[] chunks = new float[10];
         float[] chunksSize = new float[10];
-        for (int i = 1; i < 10; i++) {
-            chunksSize[i] = i * 2;
-            chunks[i] = getAmountOfChunksWithEdge(sobelEdgeDetection(img), i * 2);
-        }
-        float[] x = new float[10];
-        float[] y = new float[10];
-        for (int i = 1; i < 10; i++) {
-            x[i] = PApplet.log(1 / (float) chunksSize[i]);
-            y[i] = PApplet.log((float) chunks[i]);
-            System.err.println(
-                    "x: " + x[i] + ", y: " + y[i] + ", chunks: " + chunks[i] + ", chunksSize: " + chunksSize[i]
-                            + " calc: "
-                            + PApplet.log((float) chunks[i]) + ", " + (1 / (float) chunksSize[i]));
-        }
-        return linearRegression(x, y);
-    }
-
-    public float calculateFractalDimension() {
-        long[] totalPixels = new long[10];
-        for (int scalingFactor = 10; scalingFactor >= 1; scalingFactor--) {
-            PImage img;
-            img = sobelEdgeDetection(mandelbrot(scalingFactor));
-            int whitePixels = 0;
-            img.loadPixels();
-            for (int x = 0; x < img.width; x++) {
-                for (int y = 0; y < img.height; y++) {
-                    int c = img.pixels[x + y * img.width];
-                    if (p.red(c) == 255 && p.green(c) == 255 && p.blue(c) == 255) {
-                        whitePixels++;
-                    }
-                }
-            }
-            totalPixels[scalingFactor - 1] = whitePixels;
-            System.err.println("whitePixels: " + whitePixels);
+        for (int i = 0; i < 10; i++) {
+            chunksSize[i] = (i + 1);
+            chunks[i] = getAmountOfChunksWithEdge(sobelEdgeDetection(img), (i + 1));
         }
         float[] x = new float[10];
         float[] y = new float[10];
         for (int i = 0; i < 10; i++) {
-            x[i] = PApplet.log(1.0f / (float) (i + 1));
-            y[i] = PApplet.log((float) totalPixels[i]);
-            System.err.println("x: " + x[i] + ", y: " + y[i] + ", totalPixels: " + totalPixels[i]);
+            x[i] = PApplet.log(1 / (float) chunksSize[i]);
+            y[i] = PApplet.log((float) chunks[i]);
         }
-        float[] regression = linearRegression(x, y);
-        return regression[1];
-    }
-
-    private float[] reverseFloatArray(float[] array) {
-        float[] reversedArray = new float[array.length];
-        for (int i = 0; i < array.length; i++) {
-            reversedArray[array.length - 1 - i] = array[i];
-        }
-        return reversedArray;
+        return linearRegression(x, y)[1];
     }
 
     private int getAmountOfChunksWithEdge(PImage inputImage, int chunkSize) {
