@@ -7,11 +7,13 @@ import processing.core.PVector;
 
 public class FractalCanvas extends UIElement {
     private int maxIterations, resolutionFactor, chunkSize;
-    private float magnificationFactor, moveX, moveY, fractalDimension = 0;
+    private long magnificationFactor;
+    private float fractalDimension = 0;
+    double moveX, moveY;
     private String lastImageInputHash = "";
     private PImage img;
 
-    public FractalCanvas(PApplet p, int x, int y, int width, int height, float magnificationFactor, float moveX,
+    public FractalCanvas(PApplet p, int x, int y, int width, int height, long magnificationFactor, float moveX,
             float moveY) {
         super(p, x, y, width, height);
         this.magnificationFactor = magnificationFactor;
@@ -27,12 +29,14 @@ public class FractalCanvas extends UIElement {
         this.resolutionFactor = PApplet.max(resolutionFactor, 1);
     }
 
-    public float getMagnificationFactor() {
+    public long getMagnificationFactor() {
         return magnificationFactor;
     }
 
     public void draw() {
         if (!lastImageInputHash.equals(getInputHash())) {
+            PApplet.println("redraw");
+            // do calculation
             // System.err.println("dim: " + dim);
             // && (p.frameRate > 30)
             img = mandelbrot(resolutionFactor);
@@ -154,26 +158,31 @@ public class FractalCanvas extends UIElement {
         }
         if (key == 'f') {
             magnificationFactor /= 2.0;
+            magnificationFactor = Math.max(magnificationFactor, (long) 1);
+
         }
     }
 
     private String getInputHash() {
         return size.x + " " + size.y + " " + magnificationFactor + " " + moveX + " " + moveY + " " + maxIterations + " "
-                + resolutionFactor + " " + chunkSize;
+                + resolutionFactor;
     }
 
     private PImage mandelbrot(int resolutionFactor) {
-        PImage img = p.createImage((int) size.x / resolutionFactor, (int) size.y / resolutionFactor, PConstants.RGB);
+        PImage img = p.createImage((int) (size.x / (float) resolutionFactor), (int) (size.y / (float) resolutionFactor),
+                PConstants.RGB);
         for (int x = 0; x < img.width; x++) {
             for (int y = 0; y < img.height; y++) {
                 double zR = 0;
                 double zI = 0;
-                double cR = (x - img.width / 2) / (magnificationFactor * img.width / 4) - moveX;
-                double cI = (y - img.height / 2) / (magnificationFactor * img.height / 4) - moveY;
+                double cR = (double) ((double) x - (double) img.width / 2.0)
+                        / (double) ((double) magnificationFactor * (double) img.width / 4.0) - moveX;
+                double cI = (double) ((double) y - (double) img.height / 2.0)
+                        / (double) ((double) magnificationFactor * (double) img.height / 4.0) - moveY;
                 int iter = maxIterations;
                 while (zR * zR + zI * zI < 4 && iter > 0) {
                     double tmp = zR * zR - zI * zI + cR;
-                    zI = 2.0f * zR * zI + cI;
+                    zI = 2.0 * zR * zI + cI;
                     zR = tmp;
                     iter--;
                 }
@@ -190,8 +199,10 @@ public class FractalCanvas extends UIElement {
         double cY = 0.27015;
         for (int x = 0; x < img.width; x++) {
             for (int y = 0; y < img.height; y++) {
-                double zR = (x - img.width / 2) / (magnificationFactor * img.width / 4) - moveX;
-                double zI = (y - img.height / 2) / (magnificationFactor * img.height / 4) - moveY;
+                double zR = (double) ((double) x - (double) img.width / 2)
+                        / (double) ((double) magnificationFactor * (double) img.width / 4) - moveX;
+                double zI = (double) ((double) y - (double) img.height / 2)
+                        / (double) ((double) magnificationFactor * (double) img.height / 4) - moveY;
                 int iter = maxIterations;
                 while (zR * zR + zI * zI < 4 && iter > 0) {
                     double tmp = zR * zR - zI * zI + cX;
